@@ -50,8 +50,23 @@ export default function StudentGrievancePage() {
     setIsLoading(true)
 
     try {
-      // Simulate form submission
       await new Promise((resolve) => setTimeout(resolve, 1000))
+
+      const newGrievance = {
+        id: `GR-${Date.now().toString().slice(-6)}`,
+        studentName: formData.studentName,
+        studentId: formData.studentId,
+        category: formData.category,
+        status: "pending" as const,
+        date: new Date().toISOString().split("T")[0],
+        description: formData.description,
+        priority: formData.priority,
+      }
+
+      const existingGrievances = JSON.parse(localStorage.getItem("grievances") || "[]")
+      const updatedGrievances = [newGrievance, ...existingGrievances]
+      localStorage.setItem("grievances", JSON.stringify(updatedGrievances))
+
       setSubmitted(true)
       setFormData({
         studentName: "",

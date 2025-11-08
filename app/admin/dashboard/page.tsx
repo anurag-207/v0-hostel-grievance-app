@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
@@ -10,6 +10,7 @@ interface Grievance {
   id: string
   studentName: string
   studentId: string
+  roomNumber?: string
   category: string
   status: "pending" | "in-progress" | "resolved"
   date: string
@@ -18,46 +19,65 @@ interface Grievance {
 }
 
 export default function AdminDashboard() {
-  const [grievances, setGrievances] = useState<Grievance[]>([
-    {
-      id: "1",
-      studentName: "John Smith",
-      studentId: "STU001",
-      category: "Room Maintenance",
-      status: "pending",
-      date: "2025-01-06",
-      description: "Ceiling leak in room 305",
-      priority: "high",
-    },
-    {
-      id: "2",
-      studentName: "Sarah Johnson",
-      studentId: "STU002",
-      category: "Food Quality",
-      status: "in-progress",
-      date: "2025-01-05",
-      description: "Poor quality of mess food",
-      priority: "medium",
-    },
-    {
-      id: "3",
-      studentName: "Mike Davis",
-      studentId: "STU003",
-      category: "Noise Complaint",
-      status: "resolved",
-      date: "2025-01-04",
-      description: "Noise from adjacent room",
-      priority: "low",
-    },
-  ])
-
+  const [grievances, setGrievances] = useState<Grievance[]>([])
   const [selectedGrievance, setSelectedGrievance] = useState<Grievance | null>(null)
   const [filter, setFilter] = useState<"all" | "pending" | "in-progress" | "resolved">("all")
+  const [searchQuery, setSearchQuery] = useState("")
 
-  const filteredGrievances = filter === "all" ? grievances : grievances.filter((g) => g.status === filter)
+  useEffect(() => {
+    const storedGrievances = JSON.parse(localStorage.getItem("grievances") || "[]")
+
+    const sampleGrievances: Grievance[] = [
+      {
+        id: "1",
+        studentName: "John Smith",
+        studentId: "STU001",
+        roomNumber: "305",
+        category: "Room Maintenance",
+        status: "pending",
+        date: "2025-01-06",
+        description: "Ceiling leak in room 305",
+        priority: "high",
+      },
+      {
+        id: "2",
+        studentName: "Sarah Johnson",
+        studentId: "STU002",
+        roomNumber: "215",
+        category: "Food Quality",
+        status: "in-progress",
+        date: "2025-01-05",
+        description: "Poor quality of mess food",
+        priority: "medium",
+      },
+      {
+        id: "3",
+        studentName: "Mike Davis",
+        studentId: "STU003",
+        roomNumber: "401",
+        category: "Noise Complaint",
+        status: "resolved",
+        date: "2025-01-04",
+        description: "Noise from adjacent room",
+        priority: "low",
+      },
+    ]
+
+    const allGrievances = storedGrievances.length > 0 ? storedGrievances : sampleGrievances
+    setGrievances(allGrievances)
+  }, [])
+
+  const filteredGrievances = (filter === "all" ? grievances : grievances.filter((g) => g.status === filter)).filter(
+    (g) =>
+      g.studentName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      g.studentId.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      g.category.toLowerCase().includes(searchQuery.toLowerCase()),
+  )
 
   const updateGrievanceStatus = (id: string, newStatus: "pending" | "in-progress" | "resolved") => {
-    setGrievances((prev) => prev.map((g) => (g.id === id ? { ...g, status: newStatus } : g)))
+    const updated = grievances.map((g) => (g.id === id ? { ...g, status: newStatus } : g))
+    setGrievances(updated)
+    localStorage.setItem("grievances", JSON.stringify(updated))
     setSelectedGrievance(null)
   }
 
@@ -87,45 +107,71 @@ export default function AdminDashboard() {
     }
   }
 
+  const stats = {
+    total: grievances.length,
+    pending: grievances.filter((g) => g.status === "pending").length,
+    inProgress: grievances.filter((g) => g.status === "in-progress").length,
+    resolved: grievances.filter((g) => g.status === "resolved").length,
+    highPriority: grievances.filter((g) => g.priority === "high").length,
+    resolutionRate:
+      grievances.length > 0
+        ? Math.round((grievances.filter((g) => g.status === "resolved").length / grievances.length) * 100)
+        : 0,
+  }
+
   return (
     <main className="min-h-screen bg-background">
-      <div className="border-b border-border">
+      {/* Header */}
+      <div className="border-b border-border bg-card sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold text-foreground">Admin Dashboard</h1>
-              <p className="text-muted-foreground mt-1">Manage student grievances</p>
+              <p className="text-muted-foreground mt-1">Manage and track hostel grievances</p>
             </div>
             <Link href="/">
-              <Button variant="outline">Logout</Button>
+              <Button variant="destructive">Logout</Button>
             </Link>
           </div>
         </div>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-8">
-          <Card className="p-4">
-            <div className="text-sm text-muted-foreground mb-1">Total Grievances</div>
-            <div className="text-2xl font-bold text-foreground">{grievances.length}</div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 mb-8">
+          <Card className="p-5 border border-border hover:shadow-md transition-shadow">
+            <div className="text-sm font-medium text-muted-foreground mb-2">Total Grievances</div>
+            <div className="text-3xl font-bold text-foreground">{stats.total}</div>
+            <p className="text-xs text-muted-foreground mt-2">All submissions</p>
           </Card>
-          <Card className="p-4">
-            <div className="text-sm text-muted-foreground mb-1">Pending</div>
-            <div className="text-2xl font-bold text-yellow-600">
-              {grievances.filter((g) => g.status === "pending").length}
-            </div>
+
+          <Card className="p-5 border border-border hover:shadow-md transition-shadow">
+            <div className="text-sm font-medium text-muted-foreground mb-2">Pending</div>
+            <div className="text-3xl font-bold text-yellow-600">{stats.pending}</div>
+            <p className="text-xs text-muted-foreground mt-2">Awaiting action</p>
           </Card>
-          <Card className="p-4">
-            <div className="text-sm text-muted-foreground mb-1">In Progress</div>
-            <div className="text-2xl font-bold text-blue-600">
-              {grievances.filter((g) => g.status === "in-progress").length}
-            </div>
+
+          <Card className="p-5 border border-border hover:shadow-md transition-shadow">
+            <div className="text-sm font-medium text-muted-foreground mb-2">In Progress</div>
+            <div className="text-3xl font-bold text-blue-600">{stats.inProgress}</div>
+            <p className="text-xs text-muted-foreground mt-2">Being worked on</p>
           </Card>
-          <Card className="p-4">
-            <div className="text-sm text-muted-foreground mb-1">Resolved</div>
-            <div className="text-2xl font-bold text-green-600">
-              {grievances.filter((g) => g.status === "resolved").length}
-            </div>
+
+          <Card className="p-5 border border-border hover:shadow-md transition-shadow">
+            <div className="text-sm font-medium text-muted-foreground mb-2">Resolved</div>
+            <div className="text-3xl font-bold text-green-600">{stats.resolved}</div>
+            <p className="text-xs text-muted-foreground mt-2">Completed</p>
+          </Card>
+
+          <Card className="p-5 border border-border hover:shadow-md transition-shadow">
+            <div className="text-sm font-medium text-muted-foreground mb-2">High Priority</div>
+            <div className="text-3xl font-bold text-destructive">{stats.highPriority}</div>
+            <p className="text-xs text-muted-foreground mt-2">Urgent issues</p>
+          </Card>
+
+          <Card className="p-5 border border-border hover:shadow-md transition-shadow">
+            <div className="text-sm font-medium text-muted-foreground mb-2">Resolution Rate</div>
+            <div className="text-3xl font-bold text-primary">{stats.resolutionRate}%</div>
+            <p className="text-xs text-muted-foreground mt-2">Completion ratio</p>
           </Card>
         </div>
 
@@ -133,107 +179,137 @@ export default function AdminDashboard() {
           <div className="lg:col-span-2">
             <Card className="border border-border">
               <div className="p-6">
-                <h2 className="text-xl font-bold text-foreground mb-4">Grievances List</h2>
-
-                <div className="flex gap-2 mb-4">
-                  <Button
-                    variant={filter === "all" ? "default" : "outline"}
-                    onClick={() => setFilter("all")}
-                    className="text-sm"
-                  >
-                    All
-                  </Button>
-                  <Button
-                    variant={filter === "pending" ? "default" : "outline"}
-                    onClick={() => setFilter("pending")}
-                    className="text-sm"
-                  >
-                    Pending
-                  </Button>
-                  <Button
-                    variant={filter === "in-progress" ? "default" : "outline"}
-                    onClick={() => setFilter("in-progress")}
-                    className="text-sm"
-                  >
-                    In Progress
-                  </Button>
-                  <Button
-                    variant={filter === "resolved" ? "default" : "outline"}
-                    onClick={() => setFilter("resolved")}
-                    className="text-sm"
-                  >
-                    Resolved
-                  </Button>
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-xl font-bold text-foreground">Grievances</h2>
+                  <span className="text-sm text-muted-foreground">{filteredGrievances.length} found</span>
                 </div>
 
-                <div className="space-y-3">
-                  {filteredGrievances.map((grievance) => (
-                    <div
-                      key={grievance.id}
-                      onClick={() => setSelectedGrievance(grievance)}
-                      className="border border-border rounded-lg p-4 cursor-pointer hover:bg-accent/5 transition-colors"
+                <div className="space-y-4 mb-6">
+                  <input
+                    type="text"
+                    placeholder="Search by name, ID, or category..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full px-4 py-2 border border-border rounded-lg bg-background text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                  />
+
+                  <div className="flex gap-2 flex-wrap">
+                    <Button
+                      variant={filter === "all" ? "default" : "outline"}
+                      onClick={() => setFilter("all")}
+                      size="sm"
                     >
-                      <div className="flex items-start justify-between mb-2">
-                        <div>
-                          <h3 className="font-semibold text-foreground">{grievance.studentName}</h3>
-                          <p className="text-sm text-muted-foreground">{grievance.category}</p>
+                      All
+                    </Button>
+                    <Button
+                      variant={filter === "pending" ? "default" : "outline"}
+                      onClick={() => setFilter("pending")}
+                      size="sm"
+                    >
+                      Pending ({stats.pending})
+                    </Button>
+                    <Button
+                      variant={filter === "in-progress" ? "default" : "outline"}
+                      onClick={() => setFilter("in-progress")}
+                      size="sm"
+                    >
+                      In Progress ({stats.inProgress})
+                    </Button>
+                    <Button
+                      variant={filter === "resolved" ? "default" : "outline"}
+                      onClick={() => setFilter("resolved")}
+                      size="sm"
+                    >
+                      Resolved ({stats.resolved})
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="space-y-3 max-h-96 overflow-y-auto">
+                  {filteredGrievances.length > 0 ? (
+                    filteredGrievances.map((grievance) => (
+                      <div
+                        key={grievance.id}
+                        onClick={() => setSelectedGrievance(grievance)}
+                        className={`border border-border rounded-lg p-4 cursor-pointer transition-all hover:border-primary hover:bg-accent/5 ${
+                          selectedGrievance?.id === grievance.id ? "bg-primary/5 border-primary" : ""
+                        }`}
+                      >
+                        <div className="flex items-start justify-between mb-2">
+                          <div className="flex-1">
+                            <h3 className="font-semibold text-foreground">{grievance.studentName}</h3>
+                            <p className="text-sm text-muted-foreground">ID: {grievance.studentId}</p>
+                          </div>
+                          <Badge className={getStatusColor(grievance.status)}>{grievance.status}</Badge>
                         </div>
-                        <Badge className={getStatusColor(grievance.status)}>{grievance.status}</Badge>
+                        <div className="mb-2 flex items-center gap-2">
+                          <p className="text-sm text-foreground font-medium">{grievance.category}</p>
+                          <span
+                            className={`text-xs font-semibold px-2 py-1 rounded ${getPriorityColor(grievance.priority)} bg-opacity-10`}
+                          >
+                            {grievance.priority.toUpperCase()}
+                          </span>
+                        </div>
+                        <p className="text-sm text-foreground line-clamp-1 mb-2">{grievance.description}</p>
+                        <div className="flex items-center justify-between text-xs text-muted-foreground">
+                          <span>Room {grievance.roomNumber || "N/A"}</span>
+                          <span>{grievance.date}</span>
+                        </div>
                       </div>
-                      <p className="text-sm text-foreground mb-2 line-clamp-1">{grievance.description}</p>
-                      <div className="flex items-center justify-between">
-                        <span className={`text-sm font-medium ${getPriorityColor(grievance.priority)}`}>
-                          {grievance.priority.charAt(0).toUpperCase() + grievance.priority.slice(1)} Priority
-                        </span>
-                        <span className="text-xs text-muted-foreground">{grievance.date}</span>
-                      </div>
+                    ))
+                  ) : (
+                    <div className="text-center py-8 text-muted-foreground">
+                      <p>No grievances found</p>
                     </div>
-                  ))}
+                  )}
                 </div>
               </div>
             </Card>
           </div>
 
           <div>
-            <Card className="border border-border sticky top-6">
+            <Card className="border border-border sticky top-24">
               <div className="p-6">
                 {selectedGrievance ? (
                   <>
-                    <h2 className="text-xl font-bold text-foreground mb-4">Grievance Details</h2>
+                    <div className="flex items-center justify-between mb-4">
+                      <h2 className="text-xl font-bold text-foreground">Details</h2>
+                      <Badge className={getStatusColor(selectedGrievance.status)}>{selectedGrievance.status}</Badge>
+                    </div>
+
                     <div className="space-y-4">
-                      <div>
-                        <p className="text-sm text-muted-foreground mb-1">Student Name</p>
-                        <p className="font-semibold text-foreground">{selectedGrievance.studentName}</p>
-                      </div>
-                      <div>
-                        <p className="text-sm text-muted-foreground mb-1">Student ID</p>
-                        <p className="font-semibold text-foreground">{selectedGrievance.studentId}</p>
-                      </div>
-                      <div>
-                        <p className="text-sm text-muted-foreground mb-1">Category</p>
-                        <p className="font-semibold text-foreground">{selectedGrievance.category}</p>
-                      </div>
-                      <div>
-                        <p className="text-sm text-muted-foreground mb-1">Priority</p>
-                        <p className={`font-semibold ${getPriorityColor(selectedGrievance.priority)}`}>
-                          {selectedGrievance.priority.charAt(0).toUpperCase() + selectedGrievance.priority.slice(1)}
+                      <div className="border-b border-border pb-4">
+                        <p className="text-xs font-semibold text-muted-foreground uppercase mb-1">
+                          Student Information
                         </p>
+                        <p className="font-semibold text-foreground">{selectedGrievance.studentName}</p>
+                        <p className="text-sm text-muted-foreground">ID: {selectedGrievance.studentId}</p>
+                        <p className="text-sm text-muted-foreground">Room: {selectedGrievance.roomNumber || "N/A"}</p>
                       </div>
-                      <div>
-                        <p className="text-sm text-muted-foreground mb-1">Date Submitted</p>
-                        <p className="font-semibold text-foreground">{selectedGrievance.date}</p>
-                      </div>
-                      <div>
-                        <p className="text-sm text-muted-foreground mb-1">Description</p>
+
+                      <div className="border-b border-border pb-4">
+                        <p className="text-xs font-semibold text-muted-foreground uppercase mb-1">Grievance Details</p>
+                        <p className="text-sm font-medium text-foreground mb-2">{selectedGrievance.category}</p>
                         <p className="text-sm text-foreground">{selectedGrievance.description}</p>
                       </div>
+
+                      <div className="border-b border-border pb-4">
+                        <p className="text-xs font-semibold text-muted-foreground uppercase mb-2">Priority & Date</p>
+                        <p className={`font-semibold ${getPriorityColor(selectedGrievance.priority)}`}>
+                          {selectedGrievance.priority.charAt(0).toUpperCase() + selectedGrievance.priority.slice(1)}{" "}
+                          Priority
+                        </p>
+                        <p className="text-sm text-muted-foreground mt-1">{selectedGrievance.date}</p>
+                      </div>
+
                       <div>
-                        <p className="text-sm text-muted-foreground mb-3">Update Status</p>
+                        <p className="text-xs font-semibold text-muted-foreground uppercase mb-3">Update Status</p>
                         <div className="space-y-2">
                           <Button
                             variant={selectedGrievance.status === "pending" ? "default" : "outline"}
                             onClick={() => updateGrievanceStatus(selectedGrievance.id, "pending")}
                             className="w-full text-sm"
+                            size="sm"
                           >
                             Pending
                           </Button>
@@ -241,6 +317,7 @@ export default function AdminDashboard() {
                             variant={selectedGrievance.status === "in-progress" ? "default" : "outline"}
                             onClick={() => updateGrievanceStatus(selectedGrievance.id, "in-progress")}
                             className="w-full text-sm"
+                            size="sm"
                           >
                             In Progress
                           </Button>
@@ -248,6 +325,7 @@ export default function AdminDashboard() {
                             variant={selectedGrievance.status === "resolved" ? "default" : "outline"}
                             onClick={() => updateGrievanceStatus(selectedGrievance.id, "resolved")}
                             className="w-full text-sm"
+                            size="sm"
                           >
                             Resolved
                           </Button>
@@ -256,8 +334,9 @@ export default function AdminDashboard() {
                     </div>
                   </>
                 ) : (
-                  <div className="text-center text-muted-foreground">
-                    <p>Select a grievance to view details</p>
+                  <div className="text-center py-12">
+                    <p className="text-muted-foreground mb-2">No grievance selected</p>
+                    <p className="text-xs text-muted-foreground">Click on a grievance to view details</p>
                   </div>
                 )}
               </div>
