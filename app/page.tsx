@@ -24,11 +24,6 @@ export default function Home() {
             </div>
             <h1 className="text-4xl font-bold text-foreground mb-2">{"VNIT Hostel Grievance"} </h1>
             <p className="text-muted-foreground text-lg">Management System</p>
-            <div className="mt-6 pt-6 border-t border-border">
-              <p className="text-sm text-muted-foreground">Visvesvaraya National Institute of Technology</p>
-              <p className="text-sm text-muted-foreground">South Ambazari Road, Nagpur 440010</p>
-              <p className="text-sm text-muted-foreground">Maharashtra, India</p>
-            </div>
           </div>
 
           {!userType ? (
