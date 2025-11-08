@@ -16,7 +16,6 @@ export default function StudentGrievancePage() {
     roomNumber: "",
     hostelName: "",
     category: "room-maintenance",
-    priority: "medium",
     description: "",
   })
 
@@ -31,12 +30,6 @@ export default function StudentGrievancePage() {
     { value: "electricity", label: "Electricity Issue" },
     { value: "cleaning", label: "Cleaning Services" },
     { value: "other", label: "Other" },
-  ]
-
-  const priorities = [
-    { value: "low", label: "Low" },
-    { value: "medium", label: "Medium" },
-    { value: "high", label: "High" },
   ]
 
   const hostelNames = [
@@ -78,7 +71,6 @@ export default function StudentGrievancePage() {
         status: "pending" as const,
         date: new Date().toISOString().split("T")[0],
         description: formData.description,
-        priority: formData.priority,
       }
 
       const existingGrievances = JSON.parse(localStorage.getItem("grievances") || "[]")
@@ -93,7 +85,6 @@ export default function StudentGrievancePage() {
         roomNumber: "",
         hostelName: "",
         category: "room-maintenance",
-        priority: "medium",
         description: "",
       })
     } catch (err) {
@@ -228,21 +219,6 @@ export default function StudentGrievancePage() {
                     {categories.map((cat) => (
                       <option key={cat.value} value={cat.value}>
                         {cat.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground">Priority *</label>
-                  <select
-                    name="priority"
-                    value={formData.priority}
-                    onChange={handleChange}
-                    className="w-full px-3 py-2 border border-border rounded-lg bg-input text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-                  >
-                    {priorities.map((pri) => (
-                      <option key={pri.value} value={pri.value}>
-                        {pri.label}
                       </option>
                     ))}
                   </select>
