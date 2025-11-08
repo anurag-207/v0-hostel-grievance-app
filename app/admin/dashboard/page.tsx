@@ -33,47 +33,24 @@ export default function AdminDashboard() {
       return
     }
 
-    const storedGrievances = JSON.parse(localStorage.getItem("grievances") || "[]")
+    const fetchGrievances = async () => {
+      try {
+        const response = await fetch("/api/admin/grievances")
+        const data = await response.json()
 
-    const sampleGrievances: Grievance[] = [
-      {
-        id: "1",
-        studentName: "John Smith",
-        studentId: "STU001",
-        roomNumber: "305",
-        category: "Room Maintenance",
-        status: "pending",
-        date: "2025-01-06",
-        description: "Ceiling leak in room 305",
-        priority: "high",
-      },
-      {
-        id: "2",
-        studentName: "Sarah Johnson",
-        studentId: "STU002",
-        roomNumber: "215",
-        category: "Food Quality",
-        status: "in-progress",
-        date: "2025-01-05",
-        description: "Poor quality of mess food",
-        priority: "medium",
-      },
-      {
-        id: "3",
-        studentName: "Mike Davis",
-        studentId: "STU003",
-        roomNumber: "401",
-        category: "Noise Complaint",
-        status: "resolved",
-        date: "2025-01-04",
-        description: "Noise from adjacent room",
-        priority: "low",
-      },
-    ]
+        if (data.success && Array.isArray(data.grievances)) {
+          setGrievances(data.grievances)
+        } else {
+          console.error("Failed to fetch grievances")
+        }
+      } catch (err) {
+        console.error("Error fetching grievances:", err)
+      } finally {
+        setIsLoading(false)
+      }
+    }
 
-    const allGrievances = storedGrievances.length > 0 ? storedGrievances : sampleGrievances
-    setGrievances(allGrievances)
-    setIsLoading(false)
+    fetchGrievances()
   }, [router])
 
   const filteredGrievances = (filter === "all" ? grievances : grievances.filter((g) => g.status === filter)).filter(

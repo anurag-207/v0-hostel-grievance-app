@@ -59,34 +59,36 @@ export default function StudentGrievancePage() {
     setIsLoading(true)
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-
-      const newGrievance = {
-        id: `GR-${Date.now().toString().slice(-6)}`,
-        studentName: formData.studentName,
-        studentId: formData.studentId,
-        roomNumber: formData.roomNumber,
-        hostelName: formData.hostelName,
-        category: formData.category,
-        status: "pending" as const,
-        date: new Date().toISOString().split("T")[0],
-        description: formData.description,
-      }
-
-      const existingGrievances = JSON.parse(localStorage.getItem("grievances") || "[]")
-      const updatedGrievances = [newGrievance, ...existingGrievances]
-      localStorage.setItem("grievances", JSON.stringify(updatedGrievances))
-
-      setSubmitted(true)
-      setFormData({
-        studentName: "",
-        studentId: "",
-        email: "",
-        roomNumber: "",
-        hostelName: "",
-        category: "room-maintenance",
-        description: "",
+      const response = await fetch("/api/student/grievance", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          Name: formData.studentName,
+          ID: formData.studentId,
+          Email_address: formData.email,
+          Hostel_Name: formData.hostelName,
+          room_number: formData.roomNumber,
+          Category: formData.category,
+          Desc: formData.description,
+        }),
       })
+
+      const data = await response.json()
+
+      if (data.success) {
+        setSubmitted(true)
+        setFormData({
+          studentName: "",
+          studentId: "",
+          email: "",
+          roomNumber: "",
+          hostelName: "",
+          category: "room-maintenance",
+          description: "",
+        })
+      } else {
+        console.error("Submission error:", data.error)
+      }
     } catch (err) {
       console.error("Error submitting grievance:", err)
     } finally {

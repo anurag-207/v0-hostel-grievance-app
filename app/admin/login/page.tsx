@@ -22,18 +22,27 @@ export default function AdminLoginPage() {
     setIsLoading(true)
 
     try {
-      if (email === "admin@hostel.com" && password === "admin123") {
-        // Store admin session
+      const response = await fetch("/api/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          username: email,
+          password: password,
+        }),
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
         sessionStorage.setItem("adminLoggedIn", "true")
         sessionStorage.setItem("adminEmail", email)
-
-        // Use router.push for smooth navigation
         router.push("/admin/dashboard")
       } else {
-        setError("Invalid email or password")
+        setError(data.error || "Invalid email or password")
       }
     } catch (err) {
       setError("An error occurred. Please try again.")
+      console.error("Login error:", err)
     } finally {
       setIsLoading(false)
     }
