@@ -54,7 +54,7 @@ export default function AdminDashboard() {
 
   const handleLogout = () => {
     sessionStorage.removeItem("adminLoggedIn")
-    sessionStorage.removeItem("adminEmail")
+    sessionStorage.removeItem("adminUsername")
     router.replace("/")
   }
 

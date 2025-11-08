@@ -1,29 +1,32 @@
 import { type NextRequest, NextResponse } from "next/server"
 
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000"
+
 export async function POST(request: NextRequest) {
   try {
-    const data = await request.json()
+    const body = await request.json()
+    const { username, password } = body
 
-    const response = await fetch("http://localhost:5000/adminLogin", {
+    const response = await fetch(`${BACKEND_URL}/adminLogin`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        username: data.email,
-        password: data.password,
-      }),
+      body: JSON.stringify({ username, password }),
     })
 
-    const result = await response.json()
+    const data = await response.json()
 
-    if (result.success) {
-      return NextResponse.json({ success: true, role: result.role })
-    } else {
-      return NextResponse.json({ success: false, error: result.error || "Authentication failed" }, { status: 401 })
+    if (!response.ok) {
+      return NextResponse.json(data, { status: response.status })
     }
+
+    return NextResponse.json(data)
   } catch (error) {
     console.error("[v0] Admin login error:", error)
-    return NextResponse.json({ success: false, error: "Server error" }, { status: 500 })
+    return NextResponse.json(
+      { success: false, error: "Backend connection failed. Ensure Flask server is running on localhost:5000" },
+      { status: 500 },
+    )
   }
 }

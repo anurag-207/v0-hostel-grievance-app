@@ -1,34 +1,41 @@
 import { type NextRequest, NextResponse } from "next/server"
 
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000"
+
 export async function POST(request: NextRequest) {
   try {
-    const data = await request.json()
+    const body = await request.json()
 
-    const response = await fetch("http://localhost:5000/submitGrievance", {
+    const grievanceData = {
+      ID: Math.floor(Math.random() * 100000),
+      Name: body.studentName,
+      Email_address: body.email,
+      Hostel_Name: body.hostelName,
+      room_number: body.roomNumber,
+      Category: body.category,
+      Desc: body.description,
+    }
+
+    const response = await fetch(`${BACKEND_URL}/submitGrievance`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        ID: data.studentId,
-        Name: data.studentName,
-        Email_address: data.email,
-        Hostel_Name: data.hostelName,
-        room_number: data.roomNumber,
-        Category: data.category,
-        Desc: data.description,
-      }),
+      body: JSON.stringify(grievanceData),
     })
 
-    const result = await response.json()
+    const data = await response.json()
 
-    if (result.success) {
-      return NextResponse.json({ success: true })
-    } else {
-      return NextResponse.json({ success: false, error: "Failed to submit grievance" }, { status: 400 })
+    if (!response.ok) {
+      return NextResponse.json(data, { status: response.status })
     }
+
+    return NextResponse.json(data)
   } catch (error) {
     console.error("[v0] Grievance submission error:", error)
-    return NextResponse.json({ success: false, error: "Server error" }, { status: 500 })
+    return NextResponse.json(
+      { success: false, error: "Backend connection failed. Ensure Flask server is running on localhost:5000" },
+      { status: 500 },
+    )
   }
 }

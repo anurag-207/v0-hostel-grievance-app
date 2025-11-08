@@ -87,7 +87,7 @@ export default function StudentGrievancePage() {
       }
     } catch (err) {
       console.error("[v0] Submission error:", err)
-      setError("Connection error. Make sure Flask backend is running on port 5000")
+      setError("Connection error. Ensure backend is running.")
     } finally {
       setIsLoading(false)
     }

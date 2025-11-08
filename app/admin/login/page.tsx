@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input"
 import { Card } from "@/components/ui/card"
 
 export default function AdminLoginPage() {
-  const [email, setEmail] = useState("")
+  const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
   const [isLoading, setIsLoading] = useState(false)
@@ -27,24 +27,21 @@ export default function AdminLoginPage() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          email,
-          password,
-        }),
+        body: JSON.stringify({ username, password }),
       })
 
       const data = await response.json()
 
       if (data.success) {
         sessionStorage.setItem("adminLoggedIn", "true")
-        sessionStorage.setItem("adminEmail", email)
+        sessionStorage.setItem("adminUsername", username)
         router.push("/admin")
       } else {
         setError(data.error || "Invalid credentials")
       }
     } catch (err) {
       console.error("[v0] Login error:", err)
-      setError("Connection error. Make sure Flask backend is running on port 5000")
+      setError("Connection error. Ensure backend is running.")
     } finally {
       setIsLoading(false)
     }
@@ -76,8 +73,8 @@ export default function AdminLoginPage() {
                 <Input
                   type="text"
                   placeholder="Enter your login ID or email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
                   className="w-full"
                   required
                 />
