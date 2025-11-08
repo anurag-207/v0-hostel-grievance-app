@@ -9,8 +9,16 @@ export default function Home() {
   const [userType, setUserType] = useState<"admin" | "student" | null>(null)
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
-      <div className="flex items-center justify-center min-h-screen px-4">
+    <main
+      className="min-h-screen bg-cover bg-center bg-fixed"
+      style={{
+        backgroundImage:
+          "url(https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-7rKr26aEdvCtEAefv0ahlnHVNDYNib.png)",
+      }}
+    >
+      <div className="absolute inset-0 bg-black/40"></div>
+
+      <div className="relative flex items-center justify-center min-h-screen px-4">
         <div className="w-full max-w-md">
           <div className="text-center mb-12">
             <div className="inline-flex items-center justify-center w-16 h-16 mb-6">
@@ -22,8 +30,8 @@ export default function Home() {
                 priority
               />
             </div>
-            <h1 className="text-4xl font-bold text-foreground mb-2">{"VNIT Hostel Grievance"} </h1>
-            <p className="text-muted-foreground text-lg">Management System</p>
+            <h1 className="text-4xl font-bold text-white mb-2">{"VNIT Hostel Grievance"} </h1>
+            <p className="text-gray-100 text-lg">Management System</p>
           </div>
 
           {!userType ? (
@@ -40,7 +48,7 @@ export default function Home() {
             </div>
           ) : userType === "admin" ? (
             <div className="space-y-4">
-              <button onClick={() => setUserType(null)} className="text-sm text-muted-foreground hover:text-foreground">
+              <button onClick={() => setUserType(null)} className="text-sm text-gray-200 hover:text-white">
                 ← Back
               </button>
               <div className="bg-card rounded-lg p-6 border border-border">
@@ -51,7 +59,7 @@ export default function Home() {
             </div>
           ) : (
             <div className="space-y-4">
-              <button onClick={() => setUserType(null)} className="text-sm text-muted-foreground hover:text-foreground">
+              <button onClick={() => setUserType(null)} className="text-sm text-gray-200 hover:text-white">
                 ← Back
               </button>
               <div className="bg-card rounded-lg p-6 border border-border">
