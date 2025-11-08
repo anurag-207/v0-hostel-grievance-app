@@ -39,6 +39,20 @@ export default function StudentGrievancePage() {
     { value: "high", label: "High" },
   ]
 
+  const hostelNames = [
+    "CV Raman",
+    "JC Bose",
+    "S Ramanujan",
+    "APJ Abdul Kalam",
+    "Aryabhatta",
+    "VG Bhide",
+    "Homi J Bhabha",
+    "Meghnad Saha",
+    "Vikram Sarabhai",
+    "Kalpana Chawla",
+    "MS Swaminathan",
+  ]
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
     setFormData((prev) => ({
@@ -185,11 +199,11 @@ export default function StudentGrievancePage() {
                     required
                   >
                     <option value="">Select your hostel</option>
-                    <option value="boys-hostel-a">Boys Hostel A</option>
-                    <option value="boys-hostel-b">Boys Hostel B</option>
-                    <option value="girls-hostel-a">Girls Hostel A</option>
-                    <option value="girls-hostel-b">Girls Hostel B</option>
-                    <option value="pg-hostel">PG Hostel</option>
+                    {hostelNames.map((hostel) => (
+                      <option key={hostel} value={hostel}>
+                        {hostel}
+                      </option>
+                    ))}
                   </select>
                 </div>
                 <div className="space-y-2">
