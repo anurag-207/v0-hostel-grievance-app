@@ -3,6 +3,7 @@
 import type React from "react"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -13,6 +14,7 @@ export default function AdminLoginPage() {
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+  const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -20,11 +22,13 @@ export default function AdminLoginPage() {
     setIsLoading(true)
 
     try {
-      // Simulate admin authentication
-      // In a real app, this would call an API endpoint
       if (email === "admin@hostel.com" && password === "admin123") {
-        // Redirect to dashboard
-        window.location.href = "/admin/dashboard"
+        // Store admin session
+        sessionStorage.setItem("adminLoggedIn", "true")
+        sessionStorage.setItem("adminEmail", email)
+
+        // Use router.push for smooth navigation
+        router.push("/admin/dashboard")
       } else {
         setError("Invalid email or password")
       }
