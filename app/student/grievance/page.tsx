@@ -13,6 +13,8 @@ export default function StudentGrievancePage() {
     studentName: "",
     studentId: "",
     email: "",
+    roomNumber: "",
+    hostelName: "",
     category: "room-maintenance",
     priority: "medium",
     description: "",
@@ -56,6 +58,8 @@ export default function StudentGrievancePage() {
         id: `GR-${Date.now().toString().slice(-6)}`,
         studentName: formData.studentName,
         studentId: formData.studentId,
+        roomNumber: formData.roomNumber,
+        hostelName: formData.hostelName,
         category: formData.category,
         status: "pending" as const,
         date: new Date().toISOString().split("T")[0],
@@ -72,6 +76,8 @@ export default function StudentGrievancePage() {
         studentName: "",
         studentId: "",
         email: "",
+        roomNumber: "",
+        hostelName: "",
         category: "room-maintenance",
         priority: "medium",
         description: "",
@@ -166,6 +172,37 @@ export default function StudentGrievancePage() {
                   onChange={handleChange}
                   required
                 />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-foreground">Hostel Name *</label>
+                  <select
+                    name="hostelName"
+                    value={formData.hostelName}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 border border-border rounded-lg bg-input text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                    required
+                  >
+                    <option value="">Select your hostel</option>
+                    <option value="boys-hostel-a">Boys Hostel A</option>
+                    <option value="boys-hostel-b">Boys Hostel B</option>
+                    <option value="girls-hostel-a">Girls Hostel A</option>
+                    <option value="girls-hostel-b">Girls Hostel B</option>
+                    <option value="pg-hostel">PG Hostel</option>
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-foreground">Room Number *</label>
+                  <Input
+                    type="text"
+                    name="roomNumber"
+                    placeholder="e.g., 101, 205A"
+                    value={formData.roomNumber}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
