@@ -72,10 +72,10 @@ export default function AdminLoginPage() {
           <Card className="p-6 border border-border">
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Email</label>
+                <label className="text-sm font-medium text-foreground">Login ID / Email</label>
                 <Input
-                  type="email"
-                  placeholder="admin email"
+                  type="text"
+                  placeholder="Enter your login ID or email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full"
