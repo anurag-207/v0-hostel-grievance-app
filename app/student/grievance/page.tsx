@@ -115,12 +115,9 @@ export default function StudentGrievancePage() {
             </div>
             <h1 className="text-3xl font-bold text-foreground mb-2">Grievance Submitted</h1>
             <p className="text-muted-foreground mb-6">
-              Thank you for submitting your grievance. Our team will review it shortly and take necessary action.
+              Your issue has been submitted to the authorities. Our team will review it shortly and take necessary
+              action. You will be notified once it is resolved.
             </p>
-            <div className="bg-card border border-border rounded-lg p-4 mb-6 text-left">
-              <p className="text-sm text-muted-foreground">Grievance Reference ID</p>
-              <p className="text-lg font-semibold text-foreground">GR-{Date.now().toString().slice(-6)}</p>
-            </div>
             <Link href="/">
               <Button className="w-full bg-primary hover:bg-primary/90">Back to Home</Button>
             </Link>
