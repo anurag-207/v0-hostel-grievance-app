@@ -15,15 +15,20 @@ export default function Home() {
           <div className="text-center mb-12">
             <div className="inline-flex items-center justify-center w-16 h-16 mb-6">
               <Image
-                src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/9759793-IcneIbKwunmCjGGHzGddmAsbJJce2W.png"
+                src="/images/design-mode/9759793.png"
                 alt="Hostel Grievance Management System"
                 width={64}
                 height={64}
                 priority
               />
             </div>
-            <h1 className="text-4xl font-bold text-foreground mb-2">Hostel Grievances</h1>
+            <h1 className="text-4xl font-bold text-foreground mb-2">{"VNIT Hostel Grievance"} </h1>
             <p className="text-muted-foreground text-lg">Management System</p>
+            <div className="mt-6 pt-6 border-t border-border">
+              <p className="text-sm text-muted-foreground">Visvesvaraya National Institute of Technology</p>
+              <p className="text-sm text-muted-foreground">South Ambazari Road, Nagpur 440010</p>
+              <p className="text-sm text-muted-foreground">Maharashtra, India</p>
+            </div>
           </div>
 
           {!userType ? (
