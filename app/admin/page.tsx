@@ -12,16 +12,15 @@ export default function AdminHome() {
   const router = useRouter()
 
   useEffect(() => {
-    // Check if admin is logged in
     const adminLoggedIn = sessionStorage.getItem("adminLoggedIn")
 
     if (!adminLoggedIn) {
-      router.push("/admin/login")
+      router.replace("/admin/login")
     } else {
       setIsLoggedIn(true)
       setIsLoading(false)
     }
-  }, [router])
+  }, [])
 
   if (isLoading) {
     return (
