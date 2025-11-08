@@ -21,6 +21,7 @@ export default function StudentGrievancePage() {
 
   const [submitted, setSubmitted] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState("")
 
   const categories = [
     { value: "room-maintenance", label: "Room Maintenance" },
@@ -57,20 +58,15 @@ export default function StudentGrievancePage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
+    setError("")
 
     try {
       const response = await fetch("/api/student/grievance", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          Name: formData.studentName,
-          ID: formData.studentId,
-          Email_address: formData.email,
-          Hostel_Name: formData.hostelName,
-          room_number: formData.roomNumber,
-          Category: formData.category,
-          Desc: formData.description,
-        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
       })
 
       const data = await response.json()
@@ -87,10 +83,11 @@ export default function StudentGrievancePage() {
           description: "",
         })
       } else {
-        console.error("Submission error:", data.error)
+        setError(data.error || "Failed to submit grievance")
       }
     } catch (err) {
-      console.error("Error submitting grievance:", err)
+      console.error("[v0] Submission error:", err)
+      setError("Connection error. Make sure Flask backend is running on port 5000")
     } finally {
       setIsLoading(false)
     }
@@ -239,6 +236,8 @@ export default function StudentGrievancePage() {
                   required
                 />
               </div>
+
+              {error && <div className="text-sm text-destructive bg-destructive/10 p-3 rounded-lg">{error}</div>}
 
               <div className="flex gap-3">
                 <Button type="submit" className="flex-1 bg-primary hover:bg-primary/90" disabled={isLoading}>

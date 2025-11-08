@@ -24,10 +24,12 @@ export default function AdminLoginPage() {
     try {
       const response = await fetch("/api/admin/login", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({
-          username: email,
-          password: password,
+          email,
+          password,
         }),
       })
 
@@ -36,13 +38,13 @@ export default function AdminLoginPage() {
       if (data.success) {
         sessionStorage.setItem("adminLoggedIn", "true")
         sessionStorage.setItem("adminEmail", email)
-        router.push("/admin/dashboard")
+        router.push("/admin")
       } else {
-        setError(data.error || "Invalid email or password")
+        setError(data.error || "Invalid credentials")
       }
     } catch (err) {
-      setError("An error occurred. Please try again.")
-      console.error("Login error:", err)
+      console.error("[v0] Login error:", err)
+      setError("Connection error. Make sure Flask backend is running on port 5000")
     } finally {
       setIsLoading(false)
     }
@@ -73,7 +75,7 @@ export default function AdminLoginPage() {
                 <label className="text-sm font-medium text-foreground">Email</label>
                 <Input
                   type="email"
-                  placeholder="admin@hostel.com"
+                  placeholder="admin email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full"
@@ -99,12 +101,6 @@ export default function AdminLoginPage() {
                 {isLoading ? "Signing in..." : "Sign In"}
               </Button>
             </form>
-
-            <div className="mt-6 pt-6 border-t border-border text-center">
-              <p className="text-sm text-muted-foreground mb-4">Demo Credentials:</p>
-              <p className="text-xs text-muted-foreground">Email: admin@hostel.com</p>
-              <p className="text-xs text-muted-foreground mb-4">Password: admin123</p>
-            </div>
           </Card>
 
           <div className="mt-6 text-center">

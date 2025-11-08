@@ -1,36 +1,23 @@
 import { type NextRequest, NextResponse } from "next/server"
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000"
-
 export async function GET(request: NextRequest) {
   try {
-    // Note: Your backend needs a GET /getGrievances endpoint
-    const response = await fetch(`${BACKEND_URL}/getGrievances`, {
+    const response = await fetch("http://localhost:5000/getGrievances", {
       method: "GET",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+      },
     })
 
-    const data = await response.json()
-    return NextResponse.json({ success: true, grievances: data.grievances || [] })
+    const result = await response.json()
+
+    if (result.success || result.grievances) {
+      return NextResponse.json({ success: true, grievances: result.grievances })
+    } else {
+      return NextResponse.json({ success: false, error: "Failed to fetch grievances" }, { status: 400 })
+    }
   } catch (error) {
-    console.error("Error fetching grievances:", error)
-    // Fallback to sample data if backend is unavailable
-    return NextResponse.json({
-      success: true,
-      grievances: [
-        {
-          id: "1",
-          studentName: "John Smith",
-          studentId: "STU001",
-          roomNumber: "305",
-          hostelName: "CV Raman",
-          category: "Room Maintenance",
-          status: "pending",
-          date: "2025-01-06",
-          description: "Ceiling leak in room 305",
-          priority: "high",
-        },
-      ],
-    })
+    console.error("[v0] Fetch grievances error:", error)
+    return NextResponse.json({ success: false, error: "Server error" }, { status: 500 })
   }
 }

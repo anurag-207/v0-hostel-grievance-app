@@ -1,24 +1,29 @@
 import { type NextRequest, NextResponse } from "next/server"
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000"
-
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json()
+    const data = await request.json()
 
-    const response = await fetch(`${BACKEND_URL}/adminLogin`, {
+    const response = await fetch("http://localhost:5000/adminLogin", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify({
-        username: body.username,
-        password: body.password,
+        username: data.email,
+        password: data.password,
       }),
     })
 
-    const data = await response.json()
-    return NextResponse.json(data)
+    const result = await response.json()
+
+    if (result.success) {
+      return NextResponse.json({ success: true, role: result.role })
+    } else {
+      return NextResponse.json({ success: false, error: result.error || "Authentication failed" }, { status: 401 })
+    }
   } catch (error) {
-    console.error("Admin login error:", error)
-    return NextResponse.json({ success: false, error: "Failed to connect to backend" }, { status: 500 })
+    console.error("[v0] Admin login error:", error)
+    return NextResponse.json({ success: false, error: "Server error" }, { status: 500 })
   }
 }

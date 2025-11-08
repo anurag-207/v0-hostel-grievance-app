@@ -33,24 +33,9 @@ export default function AdminDashboard() {
       return
     }
 
-    const fetchGrievances = async () => {
-      try {
-        const response = await fetch("/api/admin/grievances")
-        const data = await response.json()
-
-        if (data.success && Array.isArray(data.grievances)) {
-          setGrievances(data.grievances)
-        } else {
-          console.error("Failed to fetch grievances")
-        }
-      } catch (err) {
-        console.error("Error fetching grievances:", err)
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    fetchGrievances()
+    const grievancesFromStorage = JSON.parse(localStorage.getItem("grievances") || "[]")
+    setGrievances(grievancesFromStorage)
+    setIsLoading(false)
   }, [router])
 
   const filteredGrievances = (filter === "all" ? grievances : grievances.filter((g) => g.status === filter)).filter(
